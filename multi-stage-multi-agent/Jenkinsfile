@@ -1,22 +1,29 @@
 pipeline {
-  agent none
-  stages {
-    stage('Back-end') {
-      agent {
-        docker { image 'maven:3.8.1-adoptopenjdk-11' }
-      }
-      steps {
-         checkout scm
-         sh 'cd /var/lib/jenkins/workspace/first-jenkins-job && mvn clean package'
-      }
+    agent any
+    stages {
+        stage('Back-end') {
+            agent {
+                docker {
+                    image 'maven:3.8.1-adoptopenjdk-11'
+                    reuseNode true
+                }
+            }
+            steps {
+                checkout scm
+                sh 'cd /var/lib/jenkins/workspace/first-jenkins-job && mvn clean package'
+            }
+        }
+        stage('Front-end') {
+            agent {
+                docker {
+                    image 'node:16-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                checkout scm
+                sh 'cd /var/lib/jenkins/workspace/first-jenkins-job && npm install'
+            }
+        }
     }
-    stage('Front-end') {
-      agent {
-        docker { image 'node:16-alpine' }
-      }
-      steps {
-        sh 'npm install'
-      }
-    }
-  }
 }
